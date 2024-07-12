@@ -3,7 +3,7 @@ package userManager;
 
 service UserService {
   rpc saveOrUpdate(User) returns (User) {};
-  rpc find(PaginateQuery) returns (PaginatedUsers) {};
+  rpc find(PaginateQueryDto) returns (PaginatedUsers) {};
   rpc findOne(UserId) returns (User) {};
   rpc findOneByEmail(EmailAddress) returns (User) {};
   rpc clearData(UserId) returns (User) {};
@@ -65,7 +65,7 @@ message EmailList { repeated EmailDto emailList = 1; }
 
 message PointsResponse { uint32 points = 1; }
 
-message PaginateQuery { string query = 1; }
+message PaginateQueryDto { string query = 1; }
 
 message PaginatedUsers {
   int32 elementsNumber = 1;
