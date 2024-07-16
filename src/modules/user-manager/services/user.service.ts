@@ -62,6 +62,10 @@ export class UserService {
                     userToUpdate.residualPoints = 0;
                     userToUpdate.role = Role.LOYALTY_CUSTOMER;
                 }
+            }else{
+                userToUpdate.name = undefined;
+                userToUpdate.surname = undefined;
+                userToUpdate.birthDate = undefined;
             }
             //GENERIC UPDATE
             if (user.email) {
@@ -85,7 +89,8 @@ export class UserService {
             };
         }
         try {
-            return await this.repository.save(userToUpdate);
+            let ret:User = await this.repository.save(userToUpdate);
+            return ret;
         } catch (e) {
             return undefined;
         }
@@ -100,6 +105,7 @@ export class UserService {
      */
     async find(@Paginate()query: PaginateQuery): Promise<Paginated<User> | undefined> {
         try {
+            query = {path:"localhost:80"};
             return await paginate(query, this.repository, {
                 sortableColumns: [
                     'id',
@@ -190,17 +196,15 @@ export class UserService {
             return undefined;
         }
         userToClean.birthDate = undefined;
-        userToClean.name = undefined;
-        userToClean.surname = undefined;
-        userToClean.customerCode = undefined;
-        userToClean.pointsUsed = undefined;
-        userToClean.residualPoints = undefined;
+        userToClean.name = "";
+        userToClean.surname = "";
         userToClean.role = Role.CUSTOMER;
         userToClean.email = userToClean.id + "@" + "deleted" + ".com";
         userToClean.saltedPassword = crypto.randomBytes(8).toString("hex");
         try {
             return await this.repository.save(userToClean);
         } catch (e) {
+            console.log(e);
             return undefined;
         }
     }

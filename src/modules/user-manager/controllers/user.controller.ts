@@ -33,7 +33,8 @@ export class UserController {
 
     @GrpcMethod('UserService', 'find')
     async find(queryDto: PaginateQueryDto, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<PaginatedUsers> {
-        let users: Paginated<User> | undefined = await this.userService.find(queryDto.query as any);
+        let query = queryDto?.query?queryDto.query:"";
+        let users: Paginated<User> | undefined = await this.userService.find(query as any);
         if (!users) {
             throw new RpcException("FIND FAILED");
         }
@@ -46,16 +47,17 @@ export class UserController {
 
     @GrpcMethod('UserService', 'findOne')
     async findOne(userIdDto: UserId, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<User> {
-        let user: User | undefined = await this.userService.findOne(userIdDto.userId);
+        let user: any = await this.userService.findOne(userIdDto.id);
         if (!user) {
             throw new RpcException("FIND ONE FAILED");
         }
+        user.birthDate = user.birthDate?user.birthDate.getTime():"";
         return user;
     }
 
     @GrpcMethod('UserService', 'findOneByEmail')
     async findOneByEmail(emailDto: EmailAddress, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<User> {
-        let user: User | undefined = await this.userService.findOne(emailDto.emailAddress);
+        let user: User | undefined = await this.userService.findOneByEmail(emailDto.emailAddress);
         if (!user) {
             throw new RpcException("FIND ONE BY EMAIL FAILED");
         }
@@ -64,7 +66,7 @@ export class UserController {
 
     @GrpcMethod('UserService', 'clearData')
     async clearData(userId: UserId, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<User> {
-        let user: User | undefined = await this.userService.clearData(userId.userId);
+        let user: User | undefined = await this.userService.clearData(userId.id);
         if (!user) {
             throw new RpcException("CLEAR DATA FAILED");
         }
@@ -96,7 +98,7 @@ export class UserController {
     }
 
     @GrpcMethod('UserService', 'setLastPurchaseDate')
-    async setLastPurchaseDate(lastPurchaseDto: LastPurchaseDto): Promise<DateUpdated> {
+    async setLastPurchaseDate(lastPurchaseDto: LastPurchaseDto,metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<DateUpdated> {
         let dataUpdated: boolean = await this.userService.setLastPurchaseDate(lastPurchaseDto.date, lastPurchaseDto.userId);
         let response: DateUpdated = {
             updated: dataUpdated
@@ -105,7 +107,7 @@ export class UserController {
     }
 
     @GrpcMethod('UserService', 'checkLoyalty')
-    async checkLoyalty(years: Years): Promise<EmailList> {
+    async checkLoyalty(years: Years, metadata: Metadata, call: ServerUnaryCall<any, any>): Promise<EmailList> {
         let emailTemplates: EmailDto[] = await this.userService.checkLoyalty(years.year);
         let response: EmailList = {
             emailTemplates: emailTemplates
