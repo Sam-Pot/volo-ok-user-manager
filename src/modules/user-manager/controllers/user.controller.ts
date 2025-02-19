@@ -51,7 +51,6 @@ export class UserController {
         if (!user) {
             throw new RpcException("FIND ONE FAILED");
         }
-        user.birthDate = user.birthDate?user.birthDate.getTime():"";
         return user;
     }
 

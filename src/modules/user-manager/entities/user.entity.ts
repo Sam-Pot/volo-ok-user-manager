@@ -17,10 +17,9 @@ export class User extends CustomBaseEntity {
     @IsString()
     surname?: string;
 
-    @Column({ nullable: true, })
+    @Column({ nullable: true, type:"bigint"})
     @IsOptional()
-    @IsDate()
-    birthDate?: Date;
+    birthDate?: number;
 
     @Column({ nullable: true, unique: true })
     @IsOptional()
